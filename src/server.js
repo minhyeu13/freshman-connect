@@ -6,7 +6,7 @@
 require('dotenv').config();
 const express = require('express');
 const { handleIncomingCall, handleSpeechInput, handleConnectCall } = require('./call-handler');
-const { decodeCipher, encodeCipher, decodeDefaultCipher, DEFAULT_CIPHER } = require('./cipher');
+const { decodeCipher, encodeCipher, decodeDefaultCipher, DEFAULT_CIPHER, DEFAULT_KEY } = require('./cipher');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -30,6 +30,7 @@ app.get('/cipher', (req, res) => {
     const result = decodeDefaultCipher();
     res.json({
         cipher: DEFAULT_CIPHER,
+        key: DEFAULT_KEY,
         decoded: result,
         message: 'Mật mã của bạn đã được giải mã!'
     });
@@ -41,14 +42,10 @@ app.post('/cipher/decode', (req, res) => {
     if (!hexString) {
         return res.status(400).json({ error: 'hexString is required' });
     }
-    const parsedKey = key ? parseInt(key) : 0x31;
-    if (key && isNaN(parsedKey)) {
-        return res.status(400).json({ error: 'key must be a valid number' });
-    }
-    const result = decodeCipher(hexString, parsedKey);
+    const result = decodeCipher(hexString, key || DEFAULT_KEY);
     res.json({
         input: hexString,
-        key: parsedKey,
+        key: key || DEFAULT_KEY,
         decoded: result
     });
 });
@@ -59,14 +56,10 @@ app.post('/cipher/encode', (req, res) => {
     if (!text) {
         return res.status(400).json({ error: 'text is required' });
     }
-    const parsedKey = key ? parseInt(key) : 0x31;
-    if (key && isNaN(parsedKey)) {
-        return res.status(400).json({ error: 'key must be a valid number' });
-    }
-    const result = encodeCipher(text, parsedKey);
+    const result = encodeCipher(text, key || DEFAULT_KEY);
     res.json({
         input: text,
-        key: parsedKey,
+        key: key || DEFAULT_KEY,
         encoded: result
     });
 });
