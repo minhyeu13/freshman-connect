@@ -6,6 +6,7 @@
 require('dotenv').config();
 const express = require('express');
 const { handleIncomingCall, handleSpeechInput, handleConnectCall } = require('./call-handler');
+const { decodeCipher, encodeCipher, decodeDefaultCipher, DEFAULT_CIPHER, DEFAULT_KEY } = require('./cipher');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -21,6 +22,45 @@ app.get('/', (req, res) => {
         status: 'running',
         service: 'Freshman Connect Hotline',
         version: '1.0.0'
+    });
+});
+
+// Cipher endpoint - Giải mã mật mã sinh viên
+app.get('/cipher', (req, res) => {
+    const result = decodeDefaultCipher();
+    res.json({
+        cipher: DEFAULT_CIPHER,
+        key: DEFAULT_KEY,
+        decoded: result,
+        message: 'Mật mã của bạn đã được giải mã!'
+    });
+});
+
+// Cipher decode endpoint với custom input
+app.post('/cipher/decode', (req, res) => {
+    const { hexString, key } = req.body;
+    if (!hexString) {
+        return res.status(400).json({ error: 'hexString is required' });
+    }
+    const result = decodeCipher(hexString, key || DEFAULT_KEY);
+    res.json({
+        input: hexString,
+        key: key || DEFAULT_KEY,
+        decoded: result
+    });
+});
+
+// Cipher encode endpoint
+app.post('/cipher/encode', (req, res) => {
+    const { text, key } = req.body;
+    if (!text) {
+        return res.status(400).json({ error: 'text is required' });
+    }
+    const result = encodeCipher(text, key || DEFAULT_KEY);
+    res.json({
+        input: text,
+        key: key || DEFAULT_KEY,
+        encoded: result
     });
 });
 
