@@ -41,10 +41,14 @@ app.post('/cipher/decode', (req, res) => {
     if (!hexString) {
         return res.status(400).json({ error: 'hexString is required' });
     }
-    const result = decodeCipher(hexString, key ? parseInt(key) : undefined);
+    const parsedKey = key ? parseInt(key) : 0x31;
+    if (key && isNaN(parsedKey)) {
+        return res.status(400).json({ error: 'key must be a valid number' });
+    }
+    const result = decodeCipher(hexString, parsedKey);
     res.json({
         input: hexString,
-        key: key || 0x31,
+        key: parsedKey,
         decoded: result
     });
 });
@@ -55,10 +59,14 @@ app.post('/cipher/encode', (req, res) => {
     if (!text) {
         return res.status(400).json({ error: 'text is required' });
     }
-    const result = encodeCipher(text, key ? parseInt(key) : undefined);
+    const parsedKey = key ? parseInt(key) : 0x31;
+    if (key && isNaN(parsedKey)) {
+        return res.status(400).json({ error: 'key must be a valid number' });
+    }
+    const result = encodeCipher(text, parsedKey);
     res.json({
         input: text,
-        key: key || 0x31,
+        key: parsedKey,
         encoded: result
     });
 });

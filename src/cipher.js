@@ -10,7 +10,13 @@
  * @returns {string} Chuỗi đã giải mã
  */
 function decodeCipher(hexString, key = 0x31) {
+    if (typeof hexString !== 'string' || !hexString.trim()) {
+        return '';
+    }
     const hexValues = hexString.split(' ').map(h => parseInt(h, 16));
+    if (hexValues.some(isNaN)) {
+        return '';
+    }
     return hexValues.map(h => String.fromCharCode(h ^ key)).join('');
 }
 
