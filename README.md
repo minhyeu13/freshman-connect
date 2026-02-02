@@ -147,6 +147,3 @@ const helpers = [
 
 ---
 
-## 📞 Cần hỗ trợ?
-
-Hỏi mình (GitHub Copilot) bất cứ lúc nào!
